@@ -15,6 +15,7 @@ pipeline {
         stage('Testing Environment') {
             steps {
                 script {
+                    
                     echo 'Deploying to Testing Environment...'
                     sh 'firebase deploy -P selenium-testing-testing --token "$FIREBASE_DEPLOY_TOKEN"'
                     
@@ -22,12 +23,34 @@ pipeline {
                     sh 'npm install selenium-webdriver mocha'
                     
                     echo 'Running Selenium Tests...'
-                    sh './node_modules/.bin/mocha test/test1.js'
-                    
-                    input message: 'After testing, do you want to continue with Staging Environment? (Click "Proceed" to continue)'
+                   def output = sh(script: './node_modules/.bin/mocha test/test1.js', returnStdout: true).trim()
+
+                   //Debugging printing the output
+                   echo "Test Output: ${output}"
+
+                   //write the result to a file
+                   if(output.contains('test Success')){
+                    writeFile file: env.TEST_RESULT_FILE, text: 'true'
+                   }else{
+                    writeFile file: env.TEST_RESULT_FILE, text: 'false'
+                   } catch (Exception e){
+                    echo "Test failed: ${e.message}"
+                    writeFile file: env.TEST_RESULT_FILE, text: 'false'
+                   }
+                    }
                 }
             }
-        } 
+
+                   
+                
+                   
+
+
+                    
+                    
+                }
+            }
+        
 
         stage('Staging Environment') {
             steps {
@@ -42,5 +65,5 @@ pipeline {
                 sh 'firebase deploy -P selenium-testing-production --token "$FIREBASE_DEPLOY_TOKEN"'
             }
         } 
-    }
-}
+    
+
