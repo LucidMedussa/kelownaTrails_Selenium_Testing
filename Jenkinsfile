@@ -2,8 +2,7 @@ pipeline {
     agent any
     environment {
         FIREBASE_DEPLOY_TOKEN = credentials('firebase-token')
-        CHROME_BIN = '/usr/bin/google-chrome'
-        CHROMEDRIVER_BIN = '/usr/bin/chromedriver'
+        
     }
 
     stages {
