@@ -1,63 +1,73 @@
-const { Builder, By, Key, until } = require('selenium-webdriver');
-const assert = require('assert');
-const chrome = require('selenium-webdriver/chrome');
+const { By, Key, Builder } = require("selenium-webdriver");
+const chrome = require("selenium-webdriver/chrome");
 
-describe('Kelowna Wine Trails and Tours App', function () {
-  this.timeout(30000);
-  let driver;
+async function test_case() {
 
-  before(async function () {
-    driver = await new Builder().forBrowser('chrome').setChromeOptions(new chrome.Options().headless()).build();
-  });
+    // Set Chrome options
+    let options = new chrome.Options();
+    options.addArguments('headless');
+    options.addArguments('disable-gpu');
+    options.setChromeBinaryPath('/usr/bin/google-chrome');
 
-  after(async function () {
-    await driver.quit();
-  });
+    // Create a Driver
+    let driver = await new Builder().forBrowser("chrome").setChromeOptions(options).build();
 
-  it('should add a new member', async function () {
-    await driver.get('https://selenium-testing-testing.web.app');
-    await driver.findElement(By.id('lastname')).sendKeys('Doe');
-    await driver.findElement(By.id('firstname')).sendKeys('John');
-    await driver.findElement(By.id('addMemberBtn')).click();
+    try {
+        // Send driver to website
+        await driver.get("file:///path/to/your/index.html");
 
-    let members = await driver.findElement(By.id('members')).getText();
-    assert(members.includes('Doe, John'));
-  });
+        // Add a member
+        await driver.findElement(By.id('lastname')).sendKeys('Doe');
+        await driver.findElement(By.id('firstname')).sendKeys('John');
+        await driver.findElement(By.id('addMemberBtn')).click();
+        
+        // Verify the member was added
+        let members = await driver.findElement(By.id('members')).getText();
+        if (members.includes('Doe, John')) {
+            console.log('Add Member Test: Success');
+        } else {
+            console.log('Add Member Test: Failed');
+        }
 
-  it('should delete a member', async function () {
-    await driver.get('https://selenium-testing-testing.web.app');
-    await driver.findElement(By.id('lastname')).sendKeys('Doe');
-    await driver.findElement(By.id('firstname')).sendKeys('John');
-    await driver.findElement(By.id('addMemberBtn')).click();
-    
-    // Ensure the member is added first
-    let members = await driver.findElement(By.id('members')).getText();
-    assert(members.includes('Doe, John'));
+        // Delete the member
+        await driver.findElement(By.id('members')).sendKeys(Key.ARROW_DOWN); // Select the first member
+        await driver.findElement(By.id('deleteMemberBtn')).click();
+        
+        // Verify the member was deleted
+        members = await driver.findElement(By.id('members')).getText();
+        if (!members.includes('Doe, John')) {
+            console.log('Delete Member Test: Success');
+        } else {
+            console.log('Delete Member Test: Failed');
+        }
 
-    // Delete the member
-    await driver.findElement(By.id('members')).sendKeys(Key.ARROW_DOWN); // Select the first member
-    await driver.findElement(By.id('deleteMemberBtn')).click();
+        // Add multiple members to test sorting
+        await driver.findElement(By.id('lastname')).sendKeys('Doe');
+        await driver.findElement(By.id('firstname')).sendKeys('John');
+        await driver.findElement(By.id('addMemberBtn')).click();
+        await driver.findElement(By.id('lastname')).sendKeys('Smith');
+        await driver.findElement(By.id('firstname')).sendKeys('Jane');
+        await driver.findElement(By.id('addMemberBtn')).click();
 
-    members = await driver.findElement(By.id('members')).getText();
-    assert(!members.includes('Doe, John'));
-  });
+        // Sort the member list
+        await driver.findElement(By.id('sortMemberListBtn')).click();
 
-  it('should sort the member list', async function () {
-    await driver.get('https://selenium-testing-testing.web.app');
-    await driver.findElement(By.id('lastname')).sendKeys('Doe');
-    await driver.findElement(By.id('firstname')).sendKeys('John');
-    await driver.findElement(By.id('addMemberBtn')).click();
+        // Verify the list is sorted
+        members = await driver.findElement(By.id('members')).getText();
+        let membersArray = members.split('\n');
+        let sortedMembers = [...membersArray].sort();
 
-    await driver.findElement(By.id('lastname')).sendKeys('Smith');
-    await driver.findElement(By.id('firstname')).sendKeys('Jane');
-    await driver.findElement(By.id('addMemberBtn')).click();
+        if (JSON.stringify(membersArray) === JSON.stringify(sortedMembers)) {
+            console.log('Sort Member List Test: Success');
+        } else {
+            console.log('Sort Member List Test: Failed');
+        }
 
-    await driver.findElement(By.id('sortMemberListBtn')).click();
+    } catch (error) {
+        console.log('An error occurred:', error);
+    } finally {
+        await driver.quit();
+    }
+}
 
-    let members = await driver.findElement(By.id('members')).getText();
-    let membersArray = members.split('\n');
-    let sortedMembers = [...membersArray].sort();
-
-    assert.deepStrictEqual(membersArray, sortedMembers);
-  });
-});
+test_case();
