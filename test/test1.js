@@ -59,13 +59,7 @@ async function test_case() {
     assert(await driver.switchTo().alert().getText() == "ERROR! You must work in this function before to send to Staging Environment!")
     // 16 | click | id=lastname | 
     let alertText = assert(await driver.switchTo().alert().getText() == "ERROR! You must work in this function before to send to Staging Environment!");
-
-    if (alertText === "ERROR! You must work in this function before to send to Staging Environment!") {
       console.log('Test Success');
-  } else {
-      console.log('Test Failed: Unexpected alert message');
-  }
-  
   }
   catch (error) {
     console.log('An error accurred:', error);
