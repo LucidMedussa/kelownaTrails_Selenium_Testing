@@ -40,29 +40,30 @@ async function test_case() {
     }
     // 13 | click | css=option | 
     await driver.findElement(By.css("option")).click()
-    // 14 | click | id=deleteMemberBtn | 
-    await driver.findElement(By.id("deleteMemberBtn")).click()
-    // 15 | assertAlert | ERROR! You must work in this function before to send to Staging Environment! | 
-    assert(await driver.switchTo().alert().getText() == "ERROR! You must work in this function before to send to Staging Environment!")
-    // 16 | click | id=lastname | 
+    // 14 | click 
     await driver.findElement(By.id("lastname")).click()
-    // 17 | type | id=lastname | Lucy Chiamaka
+    // 15 | type | id=lastname | Lucy Chiamaka
     await driver.findElement(By.id("lastname")).sendKeys("Lucy Chiamaka")
-    // 18 | click | id=firstname | 
+    // 16 | click | id=firstname | 
     await driver.findElement(By.id("firstname")).click()
-    // 19 | type | id=firstname | LUCY
+    // 17 | type | id=firstname | LUCY
     await driver.findElement(By.id("firstname")).sendKeys("LUCY")
-    // 20 | click | id=addMemberBtn | 
+    // 18 | click | id=addMemberBtn | 
     await driver.findElement(By.id("addMemberBtn")).click()
-    // 21 | click | id=sortMemberListBtn | 
+    // 19 | click | id=sortMemberListBtn | 
     await driver.findElement(By.id("sortMemberListBtn")).click()
     let resultText = await driver.findElement(By.id('result')).getText();
+    id=deleteMemberBtn | 
+    await driver.findElement(By.id("deleteMemberBtn")).click()
+    // 20 | assertAlert | ERROR! You must work in this function before to send to Staging Environment! | 
+    assert(await driver.switchTo().alert().getText() == "ERROR! You must work in this function before to send to Staging Environment!")
+    // 16 | click | id=lastname | 
 
-        if (resultText.includes("ERROR! You must work in this function before to send to Staging Environment!")) {
-            console.log('Test Success');
-        } else {
-            console.log('Test Failed');
-        }
+    if (alertText === "ERROR! You must work in this function before to send to Staging Environment!") {
+      console.log('Test Success');
+  } else {
+      console.log('Test Failed: Unexpected alert message');
+  }
   
   }
   catch (error) {
