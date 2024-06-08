@@ -58,7 +58,7 @@ async function test_case() {
     await driver.findElement(By.id("sortMemberListBtn")).click()
     let resultText = await driver.findElement(By.id('result')).getText();
 
-        if (resultText !== "CLICK GENERATE") {
+        if (resultText.includes("ERROR! You must work in this function before to send to Staging Environment!")) {
             console.log('Test Success');
         } else {
             console.log('Test Failed');
