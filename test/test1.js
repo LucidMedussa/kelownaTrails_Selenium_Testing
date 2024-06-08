@@ -58,6 +58,7 @@ async function test_case() {
     // 20 | assertAlert | ERROR! You must work in this function before to send to Staging Environment! | 
     assert(await driver.switchTo().alert().getText() == "ERROR! You must work in this function before to send to Staging Environment!")
     // 16 | click | id=lastname | 
+    let alertText = assert(await driver.switchTo().alert().getText() == "ERROR! You must work in this function before to send to Staging Environment!");
 
     if (alertText === "ERROR! You must work in this function before to send to Staging Environment!") {
       console.log('Test Success');
