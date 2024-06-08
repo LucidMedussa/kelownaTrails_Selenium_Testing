@@ -51,13 +51,11 @@ async function test_case() {
     // 18 | click | id=addMemberBtn | 
     await driver.findElement(By.id("addMemberBtn")).click()
     // 19 | click | id=sortMemberListBtn | 
-    await driver.findElement(By.id("sortMemberListBtn")).click()
-    let resultText = await driver.findElement(By.id('result')).getText();
     id=deleteMemberBtn | 
     await driver.findElement(By.id("deleteMemberBtn")).click()
     // 20 | assertAlert | ERROR! You must work in this function before to send to Staging Environment! | 
     assert(await driver.switchTo().alert().getText() == "ERROR! You must work in this function before to send to Staging Environment!")
-    // 16 | click | id=lastname | 
+    
     
       console.log('0 passing');
   }
