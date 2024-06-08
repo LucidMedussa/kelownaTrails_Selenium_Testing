@@ -15,10 +15,10 @@ pipeline {
         script {
           try {
             // Install Selenium webdriver
-            sh 'npm install selenium-webdriver mocha'
+            sh 'npm install selenium-webdriver'
 
             // Run the test and capture the output
-            def output = sh(script: './node_modules/.bin/mocha test/test1.js', returnStdout: true).trim()
+            def output = sh(script: './node test/test1.js', returnStdout: true).trim()
 
             // Debugging printing the output
             echo "Test Output: ${output}"
