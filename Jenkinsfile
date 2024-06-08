@@ -37,7 +37,7 @@ pipeline {
         expression {
           // Read the test result from the file and deploy to staging only if successful
           def testResult = readFile(env.TEST_RESULT_FILE).trim()
-          return testResult.contains('0 passing')
+          return testResult.contains('Test Success')
         }
       }
       steps {

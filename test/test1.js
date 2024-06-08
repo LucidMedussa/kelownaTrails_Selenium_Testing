@@ -57,7 +57,7 @@ async function test_case() {
     assert(await driver.switchTo().alert().getText() == "ERROR! You must work in this function before to send to Staging Environment!")
     
     
-      console.log('0 passing');
+      console.log('Test Success');
   }
   catch (error) {
     console.log('An error accurred:', error);
