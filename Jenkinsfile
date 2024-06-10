@@ -1,26 +1,26 @@
-pipeline {
-  agent any
-  environment {
+pipeline{
+    agent any
+    environment {
     FIREBASE_DEPLOY_TOKEN = credentials('firebase-token')
     TEST_RESULT_FILE = 'test_result.txt'
-  }  
-  stages{
-    stage('Building'){
-        steps {
-                sh 'python3 -m pip install selenium'
-                sh 'python3 -m pip install --upgrade urllib3==1.26.7'
-                sh 'python3 -m pip install selenium'
-                sh 'python3 -m pip install pytest'
-            }
     }
-    stage('Testing'){
-        steps{
-            echo 'Testing'
-            sh 'firebase deploy -P selenium-testing-testing --token "$FIREBASE_DEPLOY_TOKEN"' 
-            script{
-                try{                    
+
+ stages{
+        stage('Building'){
+            steps{
+                echo 'Building...'
+            }
+        } 
+        stage('Testing Environment'){
+            steps{
+             sh 'firebase deploy -P selenium-testing-testing --token "$FIREBASE_DEPLOY_TOKEN"'
+              script{
+                try{
+                    //Install Selenium webdriver
+                    sh 'npm install selenium-webdriver'
+                    
                     //Run the test and capture the output
-                    def output = sh(script: 'pytest -v test', returnStdout: true).trim()
+                    def output = sh(script: 'node test/test.js', returnStdout: true).trim()
 
                     //Debugging printing the output
                     echo "Test Output: ${output}"
@@ -37,33 +37,33 @@ pipeline {
                     writeFile file: env.TEST_RESULT_FILE, text: 'false'
                 }
             }
-            
+             }
+        } 
+        stage('Staging Environment'){
+             when{
+               expression {
+                 // Read the test result from the file id true continue
+                def testResult = readFile(env.TEST_RESULT_FILE).trim()
+                return testResult == 'true'
+                }           
+             }
+            steps{
+             echo 'Staging...'
+            }
+        } 
+        stage('Production Environment'){
+             when{
+               expression {
+                 // Read the test result from the file id true continue
+                def testResult = readFile(env.TEST_RESULT_FILE).trim()
+                return testResult == 'true'
+                }           
+             }
+            steps{
+            echo 'Production...'
+            }
+        } 
+    }
 
-        }
-    }
-    stage('Staging'){
-        when{
-               expression {
-                 // Read the test result from the file id true continue
-                def testResult = readFile(env.TEST_RESULT_FILE).trim()
-                return testResult == 'true'
-                }           
-             }
-        steps{
-          sh 'firebase deploy -P selenium-testing-staging --token "$FIREBASE_DEPLOY_TOKEN"'
-        }
-    }
-    stage('Production'){
-        when{
-               expression {
-                 // Read the test result from the file id true continue
-                def testResult = readFile(env.TEST_RESULT_FILE).trim()
-                return testResult == 'true'
-                }           
-             }
-        steps{
-               sh 'firebase deploy -P selenium-testing-production --token "$FIREBASE_DEPLOY_TOKEN"'
-        }
-    }
-  }
 }
+   
