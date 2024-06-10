@@ -4,50 +4,66 @@ pipeline {
     FIREBASE_DEPLOY_TOKEN = credentials('firebase-token')
     TEST_RESULT_FILE = 'test_result.txt'
   }  
-  stages {
-    stage('Building') {
-      steps {
-        echo 'Building'
-      }
+  stages{
+    stage('Building'){
+        steps {
+                sh 'python3 -m pip install selenium'
+                sh 'python3 -m pip install --upgrade urllib3==1.26.7'
+                sh 'python3 -m pip install selenium'
+                sh 'python3 -m pip install pytest'
+            }
     }
-    stage('Testing') {
-      steps {
-        script {
-          try {
-            // Install Selenium webdriver
-            sh 'npm install selenium-webdriver'
+    stage('Testing'){
+        steps{
+            echo 'Testing'
+            sh 'firebase deploy -P selenium-testing-testing --token "$FIREBASE_DEPLOY_TOKEN"' 
+            script{
+                try{                    
+                    //Run the test and capture the output
+                    def output = sh(script: 'pytest -v test', returnStdout: true).trim()
 
-            // Run the test and capture the output
-             def output = sh(script: 'node test/test1.js', returnStdout: true).trim() 
+                    //Debugging printing the output
+                    echo "Test Output: ${output}"
 
-            // Debugging printing the output
-            echo "Test Output: ${output}"
+                    //Write the result to a file
 
-            // Write the result to a file
-            writeFile file: env.TEST_RESULT_FILE, text: output
-          } catch (Exception e) {
-            echo "Test failed: ${e.message}"
-            writeFile file: env.TEST_RESULT_FILE, text: 'false'
-          }
+                    if(output.contains('Test Success')){
+                        writeFile file: env.TEST_RESULT_FILE, text: 'true'
+                    }else{
+                        writeFile file: env.TEST_RESULT_FILE, text: 'false'
+                    }
+                }catch (Exception e) {
+                    echo "Test failed: ${e.message}"
+                    writeFile file: env.TEST_RESULT_FILE, text: 'false'
+                }
+            }
+            
+
         }
-      }
     }
-    stage('Staging') {
-      when {
-        expression {
-          // Read the test result from the file and deploy to staging only if successful
-          def testResult = readFile(env.TEST_RESULT_FILE).trim()
-          return testResult.contains('Test Success')
+    stage('Staging'){
+        when{
+               expression {
+                 // Read the test result from the file id true continue
+                def testResult = readFile(env.TEST_RESULT_FILE).trim()
+                return testResult == 'true'
+                }           
+             }
+        steps{
+          sh 'firebase deploy -P selenium-testing-staging --token "$FIREBASE_DEPLOY_TOKEN"'
         }
-      }
-      steps {
-        sh 'firebase deploy -P selenium-testing-staging --token "$FIREBASE_DEPLOY_TOKEN"'
-      }
     }
-    stage('Production') {
-      steps {
-        sh 'firebase deploy -P selenium-testing-production --token "$FIREBASE_DEPLOY_TOKEN"'
-      }
+    stage('Production'){
+        when{
+               expression {
+                 // Read the test result from the file id true continue
+                def testResult = readFile(env.TEST_RESULT_FILE).trim()
+                return testResult == 'true'
+                }           
+             }
+        steps{
+               sh 'firebase deploy -P selenium-testing-production --token "$FIREBASE_DEPLOY_TOKEN"'
+        }
     }
   }
 }
