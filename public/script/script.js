@@ -152,7 +152,14 @@ function AddGroupMember(lastName, firstName) {
 */
 function RemoveGroupMember(lastName, firstName) {
 	
-	throw "ERROR! You must work in this function before to send to Staging Environment!"
+	let option = document.createElement("option");
+	option.text = lastName + " " + firstName;
+	membersLst.remove(option);
+
+	lastname.value = "";
+	firstname.value = "";
+
+	lastname.focus();
 	
 
 }
