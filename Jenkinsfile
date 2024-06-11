@@ -49,6 +49,7 @@ pipeline{
              }
             steps{
              echo 'Staging...'
+             sh 'firebase deploy -P selenium-testing-staging --token "$FIREBASE_DEPLOY_TOKEN"'
             }
         } 
         stage('Production Environment'){
@@ -61,6 +62,7 @@ pipeline{
              }
             steps{
             echo 'Production...'
+            sh 'firebase deploy -P selenium-testing-staging --token "$FIREBASE_DEPLOY_TOKEN"'
             }
         } 
     }
